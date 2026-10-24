@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Payroll desk</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+:root{--bg:#f3f4f0;--card:#fff;--ink:#1b2a28;--mute:#5d6b68;--line:#d8ddd8;--g:#0d6b50;--gs:#e0efe8;--sand:#b8893a;--bad:#a8321f;color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#121917;--card:#1b2522;--ink:#e6ece9;--mute:#97a5a0;--line:#2c3a36;--g:#4cc39b;--gs:#1d3a31;--sand:#d9a95a;--bad:#ef8a76;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#121917;--card:#1b2522;--ink:#e6ece9;--mute:#97a5a0;--line:#2c3a36;--g:#4cc39b;--gs:#1d3a31;--sand:#d9a95a;--bad:#ef8a76;color-scheme:dark}
+html,body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 "IBM Plex Sans",system-ui,Arial,sans-serif}
+.app{max-width:1100px;margin:0 auto;padding:18px 16px 60px}
+h1{font-size:22px;margin:0 0 2px;font-weight:600}
+.lead{color:var(--mute);margin:0 0 16px;font-size:14px}
+.top{display:flex;flex-wrap:wrap;gap:12px;align-items:end;justify-content:space-between;margin-bottom:14px}
+nav{display:flex;gap:4px;border-bottom:1px solid var(--line);margin-bottom:16px;overflow-x:auto}
+nav button{background:none;border:0;border-bottom:3px solid transparent;padding:10px 14px;font:inherit;color:var(--mute);cursor:pointer;white-space:nowrap}
+nav button.on{color:var(--g);border-color:var(--g);font-weight:600}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--g);outline-offset:1px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:14px;margin-bottom:14px}
+.sc{overflow-x:auto}
+table{border-collapse:collapse;width:100%}
+th,td{padding:6px 8px;text-align:left;border-bottom:1px solid var(--line);font-size:14px;vertical-align:middle}
+th{font-weight:600;color:var(--mute);font-size:13px;white-space:nowrap}
+td.r,th.r{text-align:right}
+input,select{font:inherit;color:var(--ink);background:var(--card);border:1px solid var(--line);border-radius:5px;padding:5px 7px;max-width:100%}
+td input{width:100%;min-width:70px}td input.n{min-width:78px;text-align:right}
+.btn{font:inherit;background:var(--g);color:#fff;border:0;border-radius:6px;padding:8px 14px;cursor:pointer;font-weight:500}
+:root[data-theme="dark"] .btn{color:#0b1512}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .btn{color:#0b1512}}
+.btn.alt{background:none;color:var(--g);border:1px solid var(--g)}
+.btn.del{background:none;color:var(--bad);border:0;padding:4px 8px}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+label{display:block;font-size:13px;color:var(--mute)}label input,label select{display:block;width:100%;margin-top:3px;box-sizing:border-box}
+.sum{display:flex;gap:22px;flex-wrap:wrap;margin:10px 0 0}.sum b{display:block;font-size:19px}
+.sum span{font-size:13px;color:var(--mute)}
+.off td{background:var(--gs)}
+.note{font-size:13px;color:var(--mute);margin:8px 0 0}
+.ov{display:none;position:fixed;inset:0;background:var(--bg);overflow:auto;z-index:9;padding:env(safe-area-inset-top,0px) 12px 40px}
+.ov.on{display:block}
+.bar{display:flex;gap:8px;padding:12px 0;position:sticky;top:0;background:var(--bg)}
+.doc{background:#fff;color:#111;max-width:760px;margin:0 auto 18px;padding:26px 30px;border:1px solid #ccc;font-size:13px}
+.doc h2{margin:0;font-size:20px}.doc .sub{margin:2px 0 12px;color:#555}
+.doc table th,.doc table td{color:#111;border-bottom:1px solid #ddd;padding:4px 6px;font-size:12.5px}
+.doc .kv td:nth-child(odd){color:#555;width:18%}
+.doc .two{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin:12px 0}
+.doc .net{display:flex;justify-content:space-between;font-size:17px;font-weight:600;border-top:2px solid #111;padding:8px 0;margin-top:6px}
+.doc .sig{display:flex;justify-content:space-between;margin-top:36px;color:#555}.doc .sig span{border-top:1px solid #555;padding-top:4px;width:40%}
+.doc.ts td,.doc.ts th{padding:2px 6px;font-size:11.5px}
+@media print{.app,.bar{display:none!important}.ov{position:static;display:block;padding:0;background:#fff}.doc{border:0;margin:0;padding:0;max-width:none;page-break-after:always}}
+</style></head>
+<body>
+<div class="app">
+ <div class="top">
+  <div><h1>Payroll desk</h1><p class="lead">Timesheets and payslips on Saudi working hours. Data stays in this browser.</p></div>
+  <label>Pay month<input type="month" id="mon" onchange="go()"></label>
+ </div>
+ <nav id="nav"></nav>
+ <div id="view"></div>
+</div>
+<div class="ov" id="ov"><div class="bar"><button class="btn" onclick="window.print()">Print</button><button class="btn alt" onclick="$('#ov').classList.remove('on')">Close</button></div><div id="docs"></div></div>
+<script>
+const $=s=>document.querySelector(s),K="hr_payroll_v1";
+const def={s:{co:"Your Company Co.",hpd:8,wd:26,ot:1.5,gr:9.75,gc:45000},e:[
+{id:"E001",n:"Ahmed Al-Qahtani",d:"Accountant",sa:1,b:6000,h:1500,t:500,o:0},
+{id:"E002",n:"Rahul Verma",d:"Site Engineer",sa:0,b:5000,h:1250,t:400,o:200},
+{id:"E003",n:"Mohammed Khan",d:"Driver",sa:0,b:2000,h:500,t:300,o:0}],t:{}};
+let S;try{S=JSON.parse(localStorage.getItem(K))||def}catch(x){S=def}
+const save=()=>{try{localStorage.setItem(K,JSON.stringify(S))}catch(x){}};
+const esc=v=>String(v==null?"":v).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const f=n=>(+n||0).toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2});
+const DN=["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+const ST={P:"Present",A:"Absent",U:"Unpaid leave",L:"Paid leave",H:"Holiday",W:"Weekly off"};
+let tab="emp",cur=null;
+const d0=new Date();$("#mon").value=d0.getFullYear()+"-"+String(d0.getMonth()+1).padStart(2,"0");
+const M=()=>$("#mon").value||"2026-10";
+const dim=m=>new Date(+m.slice(0,4),+m.slice(5),0).getDate();
+const dow=(m,d)=>new Date(+m.slice(0,4),+m.slice(5)-1,d).getDay();
+const mname=m=>new Date(+m.slice(0,4),+m.slice(5)-1,1).toLocaleString("en-GB",{month:"long",year:"numeric"});
+const rec=(m,id)=>S.t[m+"|"+id]||{d:{},x:0};
+const stOf=(r,m,d)=>(r.d[d]&&r.d[d].s)||(dow(m,d)==5?"W":"P");
+function calc(e,m){
+ const s=S.s,r=rec(m,e.id);let abs=0,ot=0,days=0;
+ for(let d=1;d<=dim(m);d++){const st=stOf(r,m,d);if(st=="A"||st=="U")abs++;if(st=="P"||st=="L"||st=="H")days++;ot+=+(r.d[d]&&r.d[d].ot)||0}
+ abs=Math.min(abs,s.wd);
+ const fixed=+e.b+ +e.h+ +e.t+ +e.o,daily=fixed/s.wd,hourly=e.b/(s.wd*s.hpd);
+ const otPay=ot*hourly*s.ot,absDed=daily*abs;
+ const gosi=e.sa?Math.min(+e.b+ +e.h,s.gc)*s.gr/100:0,oth=+r.x||0;
+ return{abs,ot,days,paid:s.wd-abs,fixed,hourly,otPay,absDed,gosi,oth,gross:fixed+otPay,ded:absDed+gosi+oth,net:fixed+otPay-absDed-gosi-oth};
+}
+function go(){
+ const T={emp:"Employees",ts:"Timesheet",pay:"Payroll",set:"Settings"};
+ $("#nav").innerHTML=Object.keys(T).map(k=>`<button class="${k==tab?"on":""}" onclick="tab='${k}';go()">${T[k]}</button>`).join("");
+ $("#view").innerHTML=({emp:vEmp,ts:vTs,pay:vPay,set:vSet})[tab]();
+}
+function vEmp(){
+ const F=[["id","ID"],["n","Name"],["d","Designation"]],N=[["b","Basic"],["h","Housing"],["t","Transport"],["o","Other"]];
+ return `<div class="card"><div class="sc"><table><tr>${F.map(x=>`<th>${x[1]}</th>`).join("")}<th>Nationality</th>${N.map(x=>`<th class="r">${x[1]} (SAR)</th>`).join("")}<th></th></tr>
+ ${S.e.map((e,i)=>`<tr>${F.map(x=>`<td><input value="${esc(e[x[0]])}" onchange="ed(${i},'${x[0]}',this.value)" aria-label="${x[1]}"></td>`).join("")}
+ <td><select onchange="ed(${i},'sa',+this.value)"><option value="1" ${e.sa?"selected":""}>Saudi</option><option value="0" ${e.sa?"":"selected"}>Non-Saudi</option></select></td>
+ ${N.map(x=>`<td><input class="n" type="number" min="0" value="${e[x[0]]}" onchange="ed(${i},'${x[0]}',+this.value)" aria-label="${x[1]}"></td>`).join("")}
+ <td><button class="btn del" onclick="del(${i})">Remove</button></td></tr>`).join("")}</table></div>
+ <div class="row" style="margin-top:12px"><button class="btn" onclick="addE()">Add employee</button></div>
+ <p class="note">Monthly amounts at full ${S.s.wd} working days. Social insurance (GOSI) is deducted for Saudi employees only.</p></div>`;
+}
+const ed=(i,k,v)=>{S.e[i][k]=v;save();go()};
+const del=i=>{if(confirm("Remove "+S.e[i].n+"?")){S.e.splice(i,1);save();go()}};
+const addE=()=>{S.e.push({id:"E"+String(S.e.length+1).padStart(3,"0"),n:"New employee",d:"",sa:0,b:0,h:0,t:0,o:0});save();go()};
+function vTs(){
+ if(!S.e.length)return `<div class="card">Add an employee first.</div>`;
+ if(!S.e.find(e=>e.id==cur))cur=S.e[0].id;
+ const m=M(),e=S.e.find(x=>x.id==cur),r=rec(m,cur),c=calc(e,m);
+ let rows="";
+ for(let d=1;d<=dim(m);d++){const st=stOf(r,m,d),o=r.d[d]&&r.d[d].ot||"",hrs=(st=="P"||st=="L"||st=="H")?S.s.hpd:0;
+  rows+=`<tr class="${st=="W"?"off":""}"><td>${d}</td><td>${DN[dow(m,d)]}</td><td><select onchange="setS(${d},this.value)">${Object.keys(ST).map(k=>`<option value="${k}" ${k==st?"selected":""}>${ST[k]}</option>`).join("")}</select></td><td class="r">${hrs}</td><td><input class="n" type="number" min="0" step="0.5" value="${o}" onchange="setO(${d},this.value)" aria-label="Overtime hours day ${d}"></td></tr>`}
+ return `<div class="card"><div class="row"><label style="min-width:240px">Employee<select onchange="cur=this.value;go()">${S.e.map(x=>`<option value="${esc(x.id)}" ${x.id==cur?"selected":""}>${esc(x.n)} (${esc(x.id)})</option>`).join("")}</select></label>
+ <label>Other deduction (SAR)<input type="number" min="0" value="${r.x||0}" onchange="setX(this.value)"></label>
+ <button class="btn alt" style="margin-top:18px" onclick="showDocs([ts(S.e.find(x=>x.id==cur),M())])">Print this timesheet</button></div>
+ <div class="sum"><div><b>${c.days}</b><span>days worked</span></div><div><b>${c.abs}</b><span>days absent</span></div><div><b>${c.ot}</b><span>overtime hours</span></div><div><b>${c.paid} of ${S.s.wd}</b><span>days paid</span></div></div></div>
+ <div class="card sc"><table><tr><th>Date</th><th>Day</th><th>Status</th><th class="r">Hours</th><th>Overtime hrs</th></tr>${rows}</table>
+ <p class="note">Fridays default to weekly off. Absent and unpaid days are deducted at 1/${S.s.wd} of monthly pay.</p></div>`;
+}
+function rw(){const k=M()+"|"+cur;return S.t[k]=S.t[k]||{d:{},x:0}}
+const setS=(d,v)=>{const r=rw();r.d[d]=r.d[d]||{};r.d[d].s=v;save();go()};
+const setO=(d,v)=>{const r=rw();r.d[d]=r.d[d]||{};r.d[d].ot=+v||0;save();go()};
+const setX=v=>{rw().x=+v||0;save();go()};
+function vPay(){
+ const m=M(),R=S.e.map(e=>({e,c:calc(e,m)})),T=k=>R.reduce((a,x)=>a+x.c[k],0);
+ return `<div class="card"><div class="row"><button class="btn" onclick="showDocs(S.e.map(e=>slip(e,M())))">Print all payslips</button><button class="btn alt" onclick="showDocs(S.e.map(e=>ts(e,M())))">Print all timesheets</button></div></div>
+ <div class="card sc"><table><tr><th>Employee</th><th class="r">Days paid</th><th class="r">Fixed pay</th><th class="r">Overtime</th><th class="r">Deductions</th><th class="r">Net pay</th><th></th></tr>
+ ${R.map(x=>`<tr><td>${esc(x.e.n)}</td><td class="r">${x.c.paid}</td><td class="r">${f(x.c.fixed)}</td><td class="r">${f(x.c.otPay)}</td><td class="r">${f(x.c.ded)}</td><td class="r"><b>${f(x.c.net)}</b></td><td><button class="btn alt" onclick="showDocs([slip(S.e.find(z=>z.id=='${esc(x.e.id)}'),M())])">Payslip</button></td></tr>`).join("")}
+ <tr><td><b>Total</b></td><td></td><td class="r"><b>${f(T("fixed"))}</b></td><td class="r"><b>${f(T("otPay"))}</b></td><td class="r"><b>${f(T("ded"))}</b></td><td class="r"><b>${f(T("net"))}</b></td><td></td></tr></table></div>`;
+}
+function vSet(){
+ const s=S.s,I=(k,l,t)=>`<label>${l}<input ${t||'type="number" step="any"'} value="${esc(s[k])}" onchange="sv('${k}',this.value)"></label>`;
+ return `<div class="card"><div class="grid">${I("co","Company name",'type="text"')}${I("hpd","Working hours per day")}${I("wd","Working days per month")}${I("ot","Overtime multiplier")}${I("gr","GOSI employee share, Saudis (%)")}${I("gc","GOSI wage cap (SAR)")}</div>
+ <p class="note">Overtime hourly rate = basic salary ÷ (working days × hours per day), paid at the multiplier (Saudi labour law: 150%). GOSI is charged on basic + housing, up to the cap. Check the current GOSI rates before running real payroll.</p></div>`;
+}
+const sv=(k,v)=>{S.s[k]=k=="co"?v:(+v||0);save();go()};
+function head(e,m,t){return `<h2>${esc(S.s.co)}</h2><p class="sub">${t} · ${mname(m)}</p>
+<table class="kv"><tr><td>Employee</td><td>${esc(e.n)}</td><td>ID</td><td>${esc(e.id)}</td></tr><tr><td>Designation</td><td>${esc(e.d)}</td><td>Nationality</td><td>${e.sa?"Saudi":"Non-Saudi"}</td></tr></table>`}
+function slip(e,m){const c=calc(e,m),R=(a,b)=>`<tr><td>${a}</td><td class="r">${f(b)}</td></tr>`;
+ return `<section class="doc">${head(e,m,"Payslip")}
+ <table class="kv"><tr><td>Working days</td><td>${S.s.wd}</td><td>Days paid</td><td>${c.paid}</td></tr><tr><td>Absent days</td><td>${c.abs}</td><td>Overtime hours</td><td>${c.ot}</td></tr></table>
+ <div class="two"><table><tr><th>Earnings</th><th class="r">SAR</th></tr>${R("Basic salary",e.b)}${R("Housing allowance",e.h)}${R("Transport allowance",e.t)}${R("Other allowance",e.o)}${R("Overtime pay",c.otPay)}<tr><td><b>Total earnings</b></td><td class="r"><b>${f(c.gross)}</b></td></tr></table>
+ <table><tr><th>Deductions</th><th class="r">SAR</th></tr>${R("Absence / unpaid leave",c.absDed)}${R("GOSI (employee share)",c.gosi)}${R("Other deductions",c.oth)}<tr><td><b>Total deductions</b></td><td class="r"><b>${f(c.ded)}</b></td></tr></table></div>
+ <div class="net"><span>Net pay</span><span>SAR ${f(c.net)}</span></div>
+ <div class="sig"><span>Employer</span><span>Employee</span></div></section>`}
+function ts(e,m){const r=rec(m,e.id),c=calc(e,m);let rows="";
+ for(let d=1;d<=dim(m);d++){const st=stOf(r,m,d),o=r.d[d]&&r.d[d].ot||0;rows+=`<tr><td>${d}</td><td>${DN[dow(m,d)]}</td><td>${ST[st]}</td><td class="r">${(st=="P"||st=="L"||st=="H")?S.s.hpd:0}</td><td class="r">${o||""}</td></tr>`}
+ return `<section class="doc ts">${head(e,m,"Timesheet")}<table><tr><th>Date</th><th>Day</th><th>Status</th><th class="r">Hours</th><th class="r">Overtime</th></tr>${rows}
+ <tr><td colspan="3"><b>Total</b></td><td class="r"><b>${c.days*S.s.hpd}</b></td><td class="r"><b>${c.ot}</b></td></tr></table>
+ <div class="sig"><span>Employee</span><span>Supervisor</span></div></section>`}
+function showDocs(a){$("#docs").innerHTML=a.join("");$("#ov").classList.add("on")}
+go();
+</script></body></html>
